@@ -15,6 +15,11 @@ public class Movie {
 	@Column(length = 4)
 	private String ageRating;
 	
+	
+	public Movie() {
+		
+	}
+	
 	public Movie(Long id, String title, String genre, String ageRating) {
 		super();
 		this.id= id;

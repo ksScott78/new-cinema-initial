@@ -12,7 +12,7 @@ public class MovieServiceDBImpl {
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager manager;
-	private JSONUtil util = new JSONUtil();
+	private JSONUtil util;
 
 	public Movie findAMovie(Long id) {
 		Movie foundMovie = manager.find(Movie.class, id);
@@ -20,19 +20,24 @@ public class MovieServiceDBImpl {
 	}
 
 	public List<Movie> getAllMovies() {
-		TypedQuery<Movie> query = manager.createQuery("SELECT * FROM Movie m ORDER BY m.title DESC", Movie.class);
+		TypedQuery<Movie> query = manager.createQuery("SELECT m FROM Movie m ORDER BY m.title DESC", Movie.class);
 		return query.getResultList();
 	}
 
 	@Transactional(Transactional.TxType.REQUIRED)
-	public void createMovie(Movie movie) {
-		manager.persist(movie);
+	public void createMovie(String movie) {
+		Movie aMovie = util.getObjectForJSON(movie,Movie.class);
+		manager.persist(aMovie);
 	}
 
 	@Transactional(Transactional.TxType.REQUIRED)
-	public void updateMovie(String newDetails) {
+	public void updateMovie(Long id, String newDetails) {
 		Movie newMovieDetails = util.getObjectForJSON(newDetails, Movie.class);
-		manager.merge(newMovieDetails);
+		Movie currentMovie = manager.find(Movie.class, id);
+		if(newMovieDetails != null) {
+			currentMovie = newMovieDetails;
+		}
+		manager.merge(currentMovie);
 	}
 
 	@Transactional(Transactional.TxType.REQUIRED)
